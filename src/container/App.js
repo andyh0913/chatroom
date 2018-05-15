@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import ChatRoom from '../components/ChatRoom';
-//import './loginbox.scss';
+import './loginbox.scss';
 
 export default class App extends Component {
     constructor(props) {

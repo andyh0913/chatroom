@@ -27,7 +27,7 @@ var onlineCount = 0;
 io.on('connection', function(socket) {
     // 监听客户端的登陆
     socket.on('login', function(obj){
-
+        
         // 用户id设为socketid
         socket.id = obj.uid;
 

@@ -16,6 +16,14 @@ var config = {
         test: /\.js$/,
         include: APP_DIR,
         loader: 'babel-loader'
+      },
+      {
+          test: /\.(png|jpg)$/,
+          loader: 'url-loader?limit=8192'
+      },
+      {
+          test: /\.scss$/,
+          loaders: ['style-loader', 'css-loader', 'sass-loader']
       }
     ]
   }
