@@ -27,5 +27,8 @@
     "node-sass": "^4.5.0",
     "url-loader": "^1.0.1",
     "file-loader": "^1.1.11"
+  },
+  "devDependencies": {
+    "webpack-cli": "^2.1.3"
   }
 }

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import RoomStatus from './RoomStatus';
 import Messages from './Messages';
 import ChatInput from './ChatInput';
+import UserList from './UserList';
 
 export default class ChatRoom extends Component {
     constructor(props) {
@@ -14,6 +15,7 @@ export default class ChatRoom extends Component {
             username: this.props.username,
             socket: socket,
             messages:[],
+            newMsgNumbers: {},
             onlineUsers: {},
             onlineCount: 0,
             userhtml:'',
@@ -24,12 +26,16 @@ export default class ChatRoom extends Component {
     // 处理在线人数及用户名，即聊天室状态栏
     handleUsers() {
         const users = this.state.onlineUsers;
+        let newMsgNumbers = this.state.newMsgNumbers;
         let userhtml = '';
         let separator = '';
         for (let key in users) {
             if (users.hasOwnProperty(key)) {
                 userhtml+= separator + users[key];
                 separator = '、';
+            }
+            if (!newMsgNumbers.hasOwnProperty(key)){
+              newMsgNumbers[key] = 0;
             }
         }
         this.setState({userhtml: userhtml})
@@ -44,12 +50,20 @@ export default class ChatRoom extends Component {
     // 类型type，用户名username，用户IDuid，用户行为action(即为登入登出)，消息ID msgId，时间time
     updateSysMsg(o, action) {
         let messages = this.state.messages;
+        let newMsgNumbers = Object.assign({},this.state.newMsgNumbers);
         const newMsg = {type:'system', username:o.user.username, uid:o.user.uid, action:action, msgId: this.generateMsgId(), time:this.generateTime()}
-        messages = messages.concat(newMsg)
+        messages = messages.concat(newMsg);
+        if(action==='login'){
+          newMsgNumbers[o.user.uid]=0;
+        }
+        else if(action==='logout'){
+          delete newMsgNumbers[o.user.uid];
+        }
         this.setState({
             onlineCount: o.onlineCount,
             onlineUsers: o.onlineUsers,
-            messages: messages
+            messages: messages,
+            newMsgNumbers:newMsgNumbers
         });
         this.handleUsers();
     }
@@ -60,7 +74,9 @@ export default class ChatRoom extends Component {
         let messages = this.state.messages;
         const newMsg = {type:'chat', username:obj.username, uid:obj.uid, action:obj.message, msgId:this.generateMsgId(), time:this.generateTime()};
         messages = messages.concat(newMsg);
-        this.setState({messages:messages})
+        let newMsgNumbers = Object.assign({},this.state.newMsgNumbers);
+        newMsgNumbers[obj.uid]++;
+        this.setState({messages:messages,newMsgNumbers:newMsgNumbers});
     }
 
     // 生成'hh-mm'格式的时间
@@ -97,6 +113,11 @@ export default class ChatRoom extends Component {
 
     render() {
         return(
+          <div className="room-box">
+            <div className="user-list-box">
+              <h2>Online Users</h2>
+              <UserList newMsgNumbers={this.state.newMsgNumbers} onlineUsers={this.state.onlineUsers} myId={this.state.myId} />
+            </div>
             <div className="chat-room">
                 <div className="welcome">
                     <div className="room-name">鱼头的聊天室 | {this.state.myName}</div>
@@ -109,6 +130,8 @@ export default class ChatRoom extends Component {
                     <Messages messages={this.state.messages} myId={this.state.myId} />
                     <ChatInput myId={this.state.myId} myName={this.state.myName} socket={this.state.socket}/>
                 </div>
-            </div>)
+            </div>
+          </div>
+            )
     }
 }
