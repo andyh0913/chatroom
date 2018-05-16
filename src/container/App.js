@@ -47,11 +47,16 @@ export default class App extends Component {
         this.setState({uid:uid, username:username});
         this.state.socket.emit('login', {uid:uid, username:username})
     }
+
+    // updateChatId
+    updateChatId(id) {
+      this.setState({chatId:id});
+    }
     render() {
         let renderDOM;
         if (this.state.uid) {
             // 如果有用户uid，则加载聊天室组件
-            renderDOM = <ChatRoom uid={this.state.uid} username={this.state.username} socket={this.state.socket}/>
+            renderDOM = <ChatRoom uid={this.state.uid} chatId={this.state.chatId} username={this.state.username} socket={this.state.socket} />
         } else {
             // 没有用户id时，加载登陆框组件
             renderDOM = (<div className="login-box">

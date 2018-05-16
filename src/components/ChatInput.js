@@ -35,6 +35,7 @@ export default class ChatInput extends Component {
         const socket = this.state.socket;
         if (message) {
             const obj = {
+                chatId: this.props.chatId,
                 uid: this.state.myId,
                 username: this.state.myName,
                 message: message
