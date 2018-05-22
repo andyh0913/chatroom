@@ -1,6 +1,6 @@
 ## How to run
 ```
-$ git clone git@github.com:andyh0913/chatroom.git
+$ git clone https://github.com/andyh0913/chatroom.git
 $ cd chatroom
 $ npm install
 $ npm run build
