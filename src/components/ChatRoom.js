@@ -24,7 +24,7 @@ export default class ChatRoom extends Component {
         this.ready();
     }
 
-    // 处理在线人数及用户名，即聊天室状态栏
+    // handle online users
     handleUsers() {
         const users = this.state.onlineUsers;
         let newMsgNumbers = this.state.newMsgNumbers;
@@ -34,7 +34,7 @@ export default class ChatRoom extends Component {
         for (let key in users) {
             if (users.hasOwnProperty(key)) {
                 userhtml+= separator + users[key];
-                separator = '、';
+                separator = ', ';
             }
             if (!newMsgNumbers.hasOwnProperty(key)){
               newMsgNumbers[key] = 0;
@@ -50,13 +50,13 @@ export default class ChatRoom extends Component {
         });
     }
 
-    // 生成消息id
+    // generate MsgId
     generateMsgId() {
         return new Date().getTime()+""+Math.floor(Math.random()*899+100);
     }
 
-    // 更新系统消息，，此处有个小坑，react中的array不能使用push，而需要concat添加元素，新增的消息有以下属性，
-    // 类型type，用户名username，用户IDuid，用户行为action(即为登入登出)，消息ID msgId，时间time
+    // update system messages with following properties:
+    // type，username，uid，action，msgId，time
     updateSysMsg(o, action) {
         let messages = JSON.parse(JSON.stringify(this.state.messages));
         let newMsgNumbers = Object.assign({},this.state.newMsgNumbers);
@@ -72,6 +72,7 @@ export default class ChatRoom extends Component {
         else if(action==='logout'){
           delete newMsgNumbers[o.user.uid];
           delete messages[o.user.uid];
+          this.setState({chatId:''});
         }
         this.setState({
             onlineCount: o.onlineCount,
@@ -83,8 +84,8 @@ export default class ChatRoom extends Component {
         this.handleUsers();
     }
 
-    // 更新消息列表，此处有个小坑，React中的Array不能使用push，而需要concat添加元素，新增的消息有以下属性，
-    // 类型type，用户名username，用户IDuid，消息内容（此处使用系统消息中的action），消息ID msgId，发送时间time
+    // update messages with following properties:
+    // type，username，uid，action，msgId，time
     updateMsg(obj) {
         let messages = JSON.parse(JSON.stringify(this.state.messages));
         const newMsg = {type:'chat', username:obj.username, uid:obj.uid, action:obj.message, msgId:this.generateMsgId(), time:this.generateTime()};
@@ -99,13 +100,12 @@ export default class ChatRoom extends Component {
         }
         let newMsgNumbers = Object.assign({},this.state.newMsgNumbers);
         if(this.state.chatId!=obj.uid && obj.chatId===this.state.myId){
-            console.log(this.state.chatId+','+obj.uid);
             newMsgNumbers[obj.uid]++;
         }
         this.setState({messages:messages,newMsgNumbers:newMsgNumbers,messages:messages});
     }
 
-    // 生成'hh-mm'格式的时间
+    // generate time in format "hh-mm"
     generateTime() {
         let hour = new Date().getHours(),
             minute = new Date().getMinutes();
@@ -114,24 +114,26 @@ export default class ChatRoom extends Component {
         return hour + ':' + minute;
     }
 
-    // 登出页面，此处是刷新页面
+    // refresh site while logout
     handleLogout() {
+        document.title = "Online Chat Room";
         location.reload();
     }
 
 
-    // 开始监控socket
+    // watching socket
     ready() {
+        document.title = this.state.myName;
         const socket = this.state.socket;
-        // 客户端监控登陆
+        // client watching login
         socket.on('login', (o)=>{
             this.updateSysMsg(o, 'login');
         })
-        // 客户端监控登出
+        // client watching logout
         socket.on('logout', (o)=>{
             this.updateSysMsg(o, 'logout');
         })
-        // 客户端监控发送消息
+        // client watching message
         socket.on('message', (obj)=>{
             this.updateMsg(obj);
         })
@@ -140,8 +142,6 @@ export default class ChatRoom extends Component {
     updateChatId(id){
         let newMsgNumbers = Object.assign({},this.state.newMsgNumbers);
         newMsgNumbers[id] = 0;
-        document.title = this.state.onlineUsers[id];
-        console.log('update chatId: '+id);
         this.setState({chatId:id,newMsgNumbers:newMsgNumbers});
     }
 
@@ -158,14 +158,11 @@ export default class ChatRoom extends Component {
                   <div className="welcome">
                       <div className="room-name">Chat Room |</div>
                       <div className="button">
-                          <button onClick={this.handleLogout}>登出</button>
+                          <button onClick={this.handleLogout}>Log out</button>
                       </div>
                   </div>
                   <RoomStatus onlineCount={this.state.onlineCount} userhtml={this.state.userhtml}/>
-                  <div ref="chatArea">
-                      <Messages messages={[]} myId={this.state.myId} />
-                      <ChatInput chatId={this.state.chatId} myId={this.state.myId} myName={this.state.myName} socket={this.state.socket}/>
-                  </div>
+                  
               </div>
             </div>
           )
@@ -181,7 +178,7 @@ export default class ChatRoom extends Component {
                   <div className="welcome">
                       <div className="room-name">Chat Room | {this.state.onlineUsers[this.state.chatId]}</div>
                       <div className="button">
-                          <button onClick={this.handleLogout}>登出</button>
+                          <button onClick={this.handleLogout}>Log out</button>
                       </div>
                   </div>
                   <RoomStatus onlineCount={this.state.onlineCount} userhtml={this.state.userhtml}/>

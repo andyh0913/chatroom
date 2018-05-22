@@ -12,17 +12,17 @@ export default class App extends Component {
         }
     }
 
-    // 生成用户id
+    // generate id
     generateUid() {
         return new Date().getTime()+""+Math.floor(Math.random()*9+1);
     }
 
-    // 监控名称变化
+    // watch change
     handleChange(e) {
         this.setState({username: e.target.value})
     }
 
-    // 监控点击提交或按回车
+    // watch click 'send' or enter
     handleClick(e) {
         e.preventDefault();
         this.handleLogin();
@@ -34,15 +34,15 @@ export default class App extends Component {
         return false;
     }
 
-    // 登陆
+    // login
     handleLogin() {
         let username = this.state.username;
 
-        // 随机生成游客名字
-        // username = '游客' + Math.floor(Math.random()*89+10)
+        // generate random guest name
+        // username = 'Guest' + Math.floor(Math.random()*89+10)
         const uid = this.generateUid();
         if (!username) {
-            username = '游客'+ uid;
+            username = 'Guest'+ uid;
         }
         this.setState({uid:uid, username:username});
         this.state.socket.emit('login', {uid:uid, username:username})
@@ -55,18 +55,18 @@ export default class App extends Component {
     render() {
         let renderDOM;
         if (this.state.uid) {
-            // 如果有用户uid，则加载聊天室组件
+            // if (uid) mount ChatRoom
             renderDOM = <ChatRoom uid={this.state.uid} chatId={this.state.chatId} username={this.state.username} socket={this.state.socket} />
         } else {
-            // 没有用户id时，加载登陆框组件
+            // if (!uid) mount Login Box
             renderDOM = (<div className="login-box">
-                            <h2>登 陆</h2>
+                            <h2>Log In</h2>
                             <div className="input">
-                                <input type="text" placeholder="请输入用户名" onChange={this.handleChange.bind(this)}
+                                <input type="text" placeholder="Please enter the user name" onChange={this.handleChange.bind(this)}
                                 onKeyPress={this.handleKeyPress.bind(this)}/>
                             </div>
                             <div className="submit">
-                                <button type="button" onClick={this.handleClick.bind(this)} >提交</button>
+                                <button type="button" onClick={this.handleClick.bind(this)} >submit</button>
                             </div>
                         </div>)
         }

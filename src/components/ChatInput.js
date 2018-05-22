@@ -1,4 +1,4 @@
-// ChatInput输入框
+// ChatInput input box
 import React, {Component} from 'react';
 
 export default class ChatInput extends Component {
@@ -12,12 +12,12 @@ export default class ChatInput extends Component {
         }
     }
 
-    // 监控input变化
+    // watch the change of input
     handleChange(e) {
         this.setState({message: e.target.value})
     }
 
-    // 点击提交或按回车
+    // click 'send' or press enter
     handleClick(e) {
         e.preventDefault();
         this.sendMessage()
@@ -29,7 +29,7 @@ export default class ChatInput extends Component {
         return false;
     }
 
-    // 发送聊天信息
+    // send message
     sendMessage(e) {
         const message = this.state.message;
         const socket = this.state.socket;
@@ -41,7 +41,7 @@ export default class ChatInput extends Component {
                 message: message
             }
             socket.emit('message', obj);
-            // 发送消息后清空输入框
+            // clear input box
             this.setState({message:''})
         }
         return false
@@ -50,11 +50,11 @@ export default class ChatInput extends Component {
         return(
             <div className="input-box">
                 <div className="input">
-                    <input type="text" maxLength="140" placeholder="按回车提交" value={this.state.message}
+                    <input type="text" maxLength="140" placeholder="Press 'enter' to send" value={this.state.message}
                     onKeyPress={this.handleKeyPress.bind(this)} onChange={this.handleChange.bind(this)}/>
                 </div>
                 <div className="button">
-                    <button type="button" onClick={this.handleClick.bind(this)}>提交</button>
+                    <button type="button" onClick={this.handleClick.bind(this)}>Send</button>
                 </div>
             </div>
             )
